@@ -60,6 +60,12 @@ def get_trts_catgrlist(prefix_to_nms, split_ratio=0.8):
     return trn_img_nms, tst_img_nms
 
 
+def wrt_lst_to_files(nms_lst, wrt_fpath):
+    with open(wrt_fpath, 'wt') as fid:
+        for nm in nms_lst:
+            fid.write(nm + '\n')
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='resplit training / testing images.')
@@ -67,6 +73,7 @@ if __name__ == "__main__":
     parser.add_argument('--suffix', type=str, default='jpg', help='image suffix string')
     parser.add_argument('--trratio', type=float, default=0.8, help='training images quantity ratio')
     parser.add_argument('--nmcatgrchar', type=str, default=None, help='image name prefix separator')
+    parser.add_argument('--trtstxtsdir', type=str, default='.', help='directory holding the training / testing image names lists')
 
     args = parser.parse_args()
 
@@ -78,5 +85,11 @@ if __name__ == "__main__":
         imgs_paths, img_names = get_orig_imgslist(args.imgsdir, args.suffix, args.nmcatgrchar)
         tr_imnms, ts_imnms = get_trts_catgrlist(img_names, args.trratio)
 
-    import pdb; pdb.set_trace()
-    # command: python dataproc_split_traintestimgs.py ./dataset/transform_for_maskrcnn/JPEGImages/ --suffix 'jpg' --nmcatgrchar '_'
+    tr_fpath = osp.join(args.trtstxtsdir, 'train.txt')
+    ts_fpath = osp.join(args.trtstxtsdir, 'test.txt')
+
+    wrt_lst_to_files(tr_imnms, tr_fpath)
+    wrt_lst_to_files(ts_imnms, ts_fpath)
+
+    # command: 
+    # python dataproc_split_traintestimgs.py ./dataset/transform_for_maskrcnn/JPEGImages/ --suffix 'jpg' --nmcatgrchar '_' --trtstxtsdir ./dataset/transform_for_maskrcnn/ImageSets/Main/
